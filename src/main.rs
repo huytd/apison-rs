@@ -5,11 +5,20 @@ extern crate rocket;
 extern crate serde_json;
 #[macro_use] extern crate rocket_contrib;
 #[macro_use] extern crate serde_derive;
+#[macro_use] extern crate diesel;
+#[macro_use] extern crate diesel_codegen;
 
 use std::io;
 use std::path::{Path, PathBuf};
 use rocket_contrib::{JSON, Value};
 use rocket::response::NamedFile;
+use diesel::prelude::*;
+use diesel::pg::PgConnection;
+
+pub mod schema;
+pub mod models;
+
+pub mod nodes;
 
 // Static web client
 
