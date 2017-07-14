@@ -1,11 +1,7 @@
-#[macro_use] extern crate diesel;
-#[macro_use] extern crate diesel_codegen;
-extern crate dotenv;
-
+use std::env;
+use dotenv::dotenv;
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
-use dotenv::dotenv;
-use std::env;
 
 pub fn establish_connection() -> PgConnection {
     dotenv().ok();
