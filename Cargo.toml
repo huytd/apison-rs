@@ -1,5 +1,5 @@
 [package]
-name = "shippi"
+name = "apison-rs"
 version = "0.1.0"
 authors = ["Huy Tran <kingbazoka@gmail.com>"]
 
