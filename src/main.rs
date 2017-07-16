@@ -9,7 +9,7 @@ extern crate serde_json;
 #[macro_use] extern crate diesel_codegen;
 extern crate dotenv;
 
-pub mod utils;
+#[macro_use] pub mod utils;
 pub mod schema;
 pub mod models;
 
@@ -23,7 +23,7 @@ use diesel::prelude::*;
 use diesel::pg::PgConnection;
 use utils::*;
 
-use models::Node;
+use models::{Node, NewNode};
 
 // Static web client
 
@@ -60,17 +60,16 @@ fn json_get(id: String) -> JSON<Value> {
 }
 
 #[post("/v0/data", format = "application/json", data = "<node>")]
-fn json_create(node: JSON<Node>) -> JSON<Value> {
+fn json_create(node: JSON<NewNode>) -> JSON<Value> {
     let db = establish_connection();
-    let new_node = Node::new(&db, &node.key, &node.value);
-    let result = Node::create(&db, new_node);
+    let result = Node::create(&db, node.into_inner());
     JSON(json!({
         "result": result
     }))
 }
 
 #[put("/v0/data/<id>", format = "application/json", data = "<node>")]
-fn json_update(id: String, node: JSON<Node>) -> JSON<Value> {
+fn json_update(id: String, node: JSON<NewNode>) -> JSON<Value> {
     let db = establish_connection();
     let new_value = &node.value;
     let result = Node::update_key(&db, &id, &new_value);

@@ -1,4 +1,4 @@
-use models::{Node};
+use models::{Node, NewNode};
 
 use diesel;
 use diesel::pg::PgConnection;
@@ -7,16 +7,7 @@ use schema::nodes;
 use schema::nodes::dsl::*;
 
 impl Node {
-    pub fn new(conn: &PgConnection, node_key: &str, node_value: &str) -> Node {
-        let next_id = (nodes.count().get_result(conn).unwrap_or(0) + 1) as i32;
-        Node {
-            id: next_id,
-            key: node_key.to_string(),
-            value: node_value.to_string()
-        }
-    }
-
-    pub fn create(conn: &PgConnection, node: Node) -> Node {
+    pub fn create(conn: &PgConnection, node: NewNode) -> Node {
         let found = nodes.filter(nodes::key.eq(&node.key)).first::<Node>(conn).ok();
         if found.is_some() {
             found.unwrap()
