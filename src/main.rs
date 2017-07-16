@@ -59,17 +59,29 @@ fn json_get(id: String) -> JSON<Value> {
     JSON(result)
 }
 
-#[post("/v0/data/<id>", format = "application/json")]
-fn json_create(id: String) -> JSON<Value> {
+#[post("/v0/data", format = "application/json", data = "<node>")]
+fn json_create(node: JSON<Node>) -> JSON<Value> {
+    let db = establish_connection();
+    let new_node = Node::new(&db, &node.key, &node.value);
+    let result = Node::create(&db, new_node);
     JSON(json!({
-        "status": "true",
+        "result": result
+    }))
+}
+
+#[delete("/v0/data/<id>", format = "application/json")]
+fn json_delete(id: String) -> JSON<Value> {
+    let db = establish_connection();
+    let result = Node::delete_key(&db, &id);
+    JSON(json!({
+        "status": result
     }))
 }
 
 fn main() {
     println!("Server is running");
     rocket::ignite()
-        .mount("/api", routes![json_get, json_get_all, json_create])
+        .mount("/api", routes![json_get, json_get_all, json_create, json_delete])
         .mount("/client", routes![index, files])
         .launch();
 }

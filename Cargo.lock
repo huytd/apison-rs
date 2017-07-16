@@ -1,5 +1,5 @@
 [root]
-name = "shippi"
+name = "apison-rs"
 version = "0.1.0"
 dependencies = [
  "diesel 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)",

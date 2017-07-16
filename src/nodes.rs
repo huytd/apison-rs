@@ -17,9 +17,14 @@ impl Node {
     }
 
     pub fn create(conn: &PgConnection, node: Node) -> Node {
-        diesel::insert(&node).into(nodes::table)
-            .get_result(conn)
-            .expect("Could not insert new Node")
+        let found = nodes.filter(nodes::key.eq(&node.key)).first::<Node>(conn).ok();
+        if found.is_some() {
+            found.unwrap()
+        } else {
+            diesel::insert(&node).into(nodes::table)
+                .get_result(conn)
+                .expect("Could not insert new Node")
+        }
     }
 
     pub fn get_all_nodes(conn: &PgConnection) -> Vec<Node> {
@@ -33,5 +38,13 @@ impl Node {
 
     pub fn get_by_key(conn: &PgConnection, key_to_find: &str) -> Option<Node> {
         nodes.filter(nodes::key.eq(key_to_find)).first::<Node>(conn).ok()
+    }
+
+    pub fn delete_key(conn: &PgConnection, key_to_delete: &str) -> i32 {
+        let result = diesel::delete(nodes.filter(nodes::key.eq(key_to_delete))).execute(conn).ok();
+        if result.is_some() {
+            return 1;
+        }
+        return 0;
     }
 }
