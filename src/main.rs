@@ -69,6 +69,16 @@ fn json_create(node: JSON<Node>) -> JSON<Value> {
     }))
 }
 
+#[put("/v0/data/<id>", format = "application/json", data = "<node>")]
+fn json_update(id: String, node: JSON<Node>) -> JSON<Value> {
+    let db = establish_connection();
+    let new_value = &node.value;
+    let result = Node::update_key(&db, &id, &new_value);
+    JSON(json!({
+        "result": result
+    }))
+}
+
 #[delete("/v0/data/<id>", format = "application/json")]
 fn json_delete(id: String) -> JSON<Value> {
     let db = establish_connection();
@@ -81,7 +91,7 @@ fn json_delete(id: String) -> JSON<Value> {
 fn main() {
     println!("Server is running");
     rocket::ignite()
-        .mount("/api", routes![json_get, json_get_all, json_create, json_delete])
+        .mount("/api", routes![json_get, json_get_all, json_create, json_update, json_delete])
         .mount("/client", routes![index, files])
         .launch();
 }

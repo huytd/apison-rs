@@ -40,6 +40,13 @@ impl Node {
         nodes.filter(nodes::key.eq(key_to_find)).first::<Node>(conn).ok()
     }
 
+    pub fn update_key(conn: &PgConnection, key_to_update: &str, new_value: &str) -> Node {
+        diesel::update(nodes.filter(nodes::key.eq(key_to_update)))
+                .set(value.eq(new_value))
+                .get_result::<Node>(conn)
+                .expect("Could not update post")
+    }
+
     pub fn delete_key(conn: &PgConnection, key_to_delete: &str) -> i32 {
         let result = diesel::delete(nodes.filter(nodes::key.eq(key_to_delete))).execute(conn).ok();
         if result.is_some() {
