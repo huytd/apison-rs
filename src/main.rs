@@ -54,13 +54,13 @@ fn json_get(id: String) -> JSON<Value> {
     let found = Node::get_by_key(&db, &id);
     let mut result = json!({ "result": "" });
     if found.is_some() {
-        result = json!({ "results": found.unwrap() });
+        result = json!({ "results": found.unwrap().value });
     }
     JSON(result)
 }
 
 #[post("/v0/data", format = "application/json", data = "<node>")]
-fn json_create(node: JSON<NewNode>) -> JSON<Value> {
+fn json_create(node: JSON<NewNode>, token: AuthToken) -> JSON<Value> {
     let db = establish_connection();
     let result = Node::create(&db, node.into_inner());
     JSON(json!({
@@ -69,7 +69,7 @@ fn json_create(node: JSON<NewNode>) -> JSON<Value> {
 }
 
 #[put("/v0/data/<id>", format = "application/json", data = "<node>")]
-fn json_update(id: String, node: JSON<NewNode>) -> JSON<Value> {
+fn json_update(id: String, node: JSON<NewNode>, token: AuthToken) -> JSON<Value> {
     let db = establish_connection();
     let new_value = &node.value;
     let result = Node::update_key(&db, &id, &new_value);
@@ -79,7 +79,7 @@ fn json_update(id: String, node: JSON<NewNode>) -> JSON<Value> {
 }
 
 #[delete("/v0/data/<id>", format = "application/json")]
-fn json_delete(id: String) -> JSON<Value> {
+fn json_delete(id: String, token: AuthToken) -> JSON<Value> {
     let db = establish_connection();
     let result = Node::delete_key(&db, &id);
     JSON(json!({

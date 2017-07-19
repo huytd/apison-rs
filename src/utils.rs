@@ -3,6 +3,26 @@ use dotenv::dotenv;
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 
+use rocket::Outcome;
+use rocket::http::Status;
+use rocket::request::{self, Request, FromRequest};
+
+pub struct AuthToken(String);
+
+impl<'a, 'r> FromRequest<'a, 'r> for AuthToken {
+    type Error = ();
+
+    fn from_request(request: &'a Request<'r>) -> request::Outcome<AuthToken, ()> {
+        let keys: Vec<_> = request.headers().get("AuthToken").collect();
+        if keys.len() != 1 {
+            return Outcome::Failure((Status::BadRequest, ()));
+        }
+        let key = keys[0];
+
+        return Outcome::Success(AuthToken(key.to_string()));
+    }
+}
+
 pub fn establish_connection() -> PgConnection {
     dotenv().ok();
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
@@ -26,3 +46,5 @@ macro_rules! build_model {
         }
     }
 }
+
+
